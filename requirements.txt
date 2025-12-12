@@ -5,3 +5,6 @@ jinja2
 databases
 sqlalchemy
 asyncpg
+
+python-dotenv
+psycopg2-binary

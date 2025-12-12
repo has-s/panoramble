@@ -21,18 +21,34 @@ docker-compose down
 
 ## 3. Environment Variables
 
-Create a .env file in the project root with the following example:
+Create `.env.local` and `.env.docker` files in the project root.
+
+### `.env.local` (for running locally)
 
 ```env
+APP_ENV=local
+
 POSTGRES_USER=user
 POSTGRES_PASSWORD=pass
-POSTGRES_DB=newsdb #do not change if you not sure.
+POSTGRES_DB=newsdb
+POSTGRES_HOST=localhost
+```
+
+### `.env.docker` (for running inside Docker)
+
+```env
+APP_ENV=docker
+
+POSTGRES_USER=docker_user
+POSTGRES_PASSWORD=docker_pass
+POSTGRES_DB=newsdb
+POSTGRES_HOST=db
 ```
 ---
 
 ## Database Structure
 
-Table: news
+Table: newsdb
 
 Stores the quiz news items.
 
@@ -40,25 +56,25 @@ Stores the quiz news items.
 ```sql
 CREATE TABLE news (
     id SERIAL PRIMARY KEY,
-    title TEXT NOT NULL,
-    content TEXT,
-    media_type TEXT CHECK (media_type IN ('txt','img','img_txt')) NOT NULL,
-    news_type TEXT CHECK (news_type IN ('real','fake')) NOT NULL,
-    source TEXT,
-    description TEXT,
-    file_path TEXT,  -- URL or path to image/media if applicable
-    created_at TIMESTAMP DEFAULT now()
+    headline TEXT NOT NULL,
+    body TEXT,
+    format TEXT CHECK (format IN ('txt','img','img_txt')) NOT NULL,
+    is_real BOOLEAN NOT NULL,
+    media_url TEXT,
+    summary TEXT,
+    source_name TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 ```
 ### Quick SQL Commands
 
 Run SQL commands directly inside the database container:
 ```bash
-docker exec -it db psql -U user -d newsdb -c "SQL REQUEST HERE"
+docker exec -it db psql -U {user} -d newsdb -c "SQL REQUEST HERE"
 ```
 Example: check all news entries:
 ```bash
-docker exec -it db psql -U user -d newsdb -c "SELECT * FROM news;"
+docker exec -it db psql -U {user} -d newsdb -c "SELECT * FROM news;"
 ```
 For development, you can seed the database with test data using the **backend/scripts/seed_news.py** script.
 
